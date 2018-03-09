@@ -2,103 +2,83 @@
 
 namespace app\models;
 
-class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
+use Yii;
+use yii\db\Query;
+
+/**
+ * User class for athenticated users.
+ */
+class User extends \yii\base\Object
 {
     public $id;
-    public $username;
-    public $password;
-    public $authKey;
-    public $accessToken;
+    public $name;
+    public $email;
+    public $date_add;
 
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
-
-
-    /**
-     * {@inheritdoc}
-     */
     public static function findIdentity($id)
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        $query = new Query();
+
+        $row = $query->select(['*'])
+                     ->from('users')
+                     ->where(['id' => $id])
+                     ->one();
+
+        
+        return isset($row['id'])? new static($row) : null;
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public static function findIdentityByAccessToken($token, $type = null)
-    {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Finds user by username
-     *
-     * @param string $username
-     * @return static|null
-     */
-    public static function findByUsername($username)
-    {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * {@inheritdoc}
+     * @inheritdoc
+     * take user $id
+     * @return int
      */
     public function getId()
     {
         return $this->id;
     }
 
+
     /**
-     * {@inheritdoc}
+     * add new user to DB
+     * MySQL query INSERT INTO users (name, email) VALUES ($username, $useremail)
+     * @param  string $useremail
+     * @param  string $username
+     * @return static|null
      */
-    public function getAuthKey()
+    public static function addUser($username, $useremail)
     {
-        return $this->authKey;
+        $connection = \Yii::$app->db;
+        $t = time();
+        $command = $connection->createCommand()
+                                    ->insert('users', [
+                                        'name' => $username,
+                                        'email' => $useremail,
+                                        'date_add' => $t,
+                                    ]);
+        $command->execute();
+        $id = $connection->getLastInsertID();
+
+        $arr =  [
+                    'id' => $id,
+                    'name' => $username,
+                    'email' => $useremail,
+                    'date_add' => $t,
+                ];
+        return new static($arr);
     }
 
     /**
-     * {@inheritdoc}
+     * save user to DB
      */
-    public function validateAuthKey($authKey)
+    public function saveUser()
     {
-        return $this->authKey === $authKey;
-    }
-
-    /**
-     * Validates password
-     *
-     * @param string $password password to validate
-     * @return bool if password provided is valid for current user
-     */
-    public function validatePassword($password)
-    {
-        return $this->password === $password;
+        $connection = \Yii::$app->db;
+        $command = $connection->createCommand()
+                                    ->update('users', [
+                                        'name' => $this->name,
+                                        'email' => $this->email,
+                                    ], 'id='.$this->id);
+        $command->execute();
     }
 }

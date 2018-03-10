@@ -21,7 +21,7 @@ class User extends \yii\base\Object
 
         $row = $query->select(['*'])
                      ->from('users')
-                     ->where(['id' => $id])
+                     ->where(['id' => intval($id)])
                      ->one();
 
         

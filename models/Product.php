@@ -23,7 +23,7 @@ class Product extends \yii\base\Object
 
         $row = $query->select(['*'])
                      ->from('products')
-                     ->where(['id' => $id])
+                     ->where(['id' => intval($id)])
                      ->one();
 
         

@@ -22,11 +22,27 @@ class Order extends \yii\base\Object
 
         $row = $query->select(['*'])
                      ->from('orders')
-                     ->where(['id' => $id])
+                     ->where(['id' => intval($id)])
                      ->one();
 
-        
         return isset($row['id'])? new static($row) : null;
+    }
+
+    /**
+     * list orders
+     * MySQL query SELECT * FROM orders ORDER BY date_add DESC
+     * @return array Order
+     */
+    public static function listOrders()
+    {
+        $query = new Query();
+
+        $rows = $query->select(['*'])
+            ->from('orders')
+            ->orderBy(['date_add' => SORT_DESC])
+            ->all();
+
+        return $rows;
     }
 
     /**
@@ -46,14 +62,14 @@ class Order extends \yii\base\Object
      * @param  integer $user_id
      * @return static|null
      */
-    public static function addOrder($user_id)
+    public static function addOrder($user_id = null)
     {
         $connection = \Yii::$app->db;
         $t = time();
 
         $command = $connection->createCommand()
                                     ->insert('orders', [
-                                        'user_id' => $user_id,
+                                        'user_id' => intval($user_id),
                                         'date_add' => $t,
                                     ]);
         $command->execute();
@@ -62,7 +78,7 @@ class Order extends \yii\base\Object
         $arr =  [
                     'id' => $id,
                     'status' => 'new',
-                    'user_id' => $user_id,
+                    'user_id' => intval($user_id),
                     'date_add' => $t,
                     'date_change' => null,
                 ];
@@ -83,7 +99,7 @@ class Order extends \yii\base\Object
         $command = $connection->createCommand()
             ->insert('orderrefproducts', [
                 'order_id' => $this->id,
-                'product_id' => $product_id,
+                'product_id' => intval($product_id),
             ]);
         $result = $command->execute();
 
@@ -100,7 +116,7 @@ class Order extends \yii\base\Object
     }
 
     /**
-     * remove product from order
+     * delete product from order
      * MySQL query DELETE FROM orderrefproducts WHERE order_id=$this->id AND product_id=$product_id)
      * @param  integer $product_id
      * @return boolean
@@ -111,7 +127,7 @@ class Order extends \yii\base\Object
         $command = $connection->createCommand()
             ->delete('orderrefproducts', [
                 'order_id' => $this->id,
-                'product_id' => $product_id,
+                'product_id' => intval($product_id),
             ]);
         $result = $command->execute();
 
@@ -125,6 +141,23 @@ class Order extends \yii\base\Object
         }
 
         return $result > 0;
+    }
+
+    /**
+     * list products ids of order
+     * MySQL query SELECT product_id FROM orderrefproducts WHERE order_id=$this->id
+     * @return array
+     */
+    public function listProducts()
+    {
+        $query = new Query();
+
+        $rows = $query->select(['product_id'])
+            ->from('orderrefproducts')
+            ->where(['id' => $this->id])
+            ->all();
+
+        return $rows;
     }
 
     /**

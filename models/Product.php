@@ -31,6 +31,25 @@ class Product extends \yii\base\Object
     }
 
     /**
+     * find orders by user name
+     * MySQL query SELECT * FROM orders LEFT JOIN users ON orders.user_id=user.id WHERE users.name=$name ORDER BY orders.date_add DESC
+     * @param string $name
+     * @return array
+     */
+    public static function findOrderedProductsByUserName($name)
+    {
+        $query = new Query();
+
+        $rows = $query->select(['*'])
+            ->from('products')
+            ->where(['name' => $name])
+            ->andWhere(['>=', 'num', 0])
+            ->all();
+
+        return $rows;
+    }
+
+    /**
      * @inheritdoc
      * take product $id
      * @return int
@@ -77,6 +96,24 @@ class Product extends \yii\base\Object
     }
 
     /**
+     * list products
+     * MySQL query SELECT * FROM products WHERE num>=1 ORDER BY name
+     * @return array
+     */
+    public function listProducts()
+    {
+        $query = new Query();
+
+        $rows = $query->select(['*'])
+            ->from('products')
+            ->where(['>=', 'num', 1])
+            ->orderBy(['name' => SORT_ASC])
+            ->all();
+
+        return $rows;
+    }
+
+    /**
      * save product to DB
      */
     public function saveProduct()
@@ -90,6 +127,16 @@ class Product extends \yii\base\Object
                                         'price' => $this->price,
                                         'num' => $this->num,
                                     ], 'id='.$this->id);
+        $command->execute();
+    }
+
+    /**
+     * decrement products num
+     */
+    public function decrement()
+    {
+        $connection = \Yii::$app->db;
+        $command = $connection->createCommand('UPDATE products SET num=num-1 WHERE id='.intval($this->id));
         $command->execute();
     }
 }

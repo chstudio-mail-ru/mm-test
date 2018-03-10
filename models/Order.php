@@ -31,7 +31,7 @@ class Order extends \yii\base\Object
     /**
      * list orders
      * MySQL query SELECT * FROM orders ORDER BY date_add DESC
-     * @return array Order
+     * @return array
      */
     public static function listOrders()
     {
@@ -40,6 +40,26 @@ class Order extends \yii\base\Object
         $rows = $query->select(['*'])
             ->from('orders')
             ->orderBy(['date_add' => SORT_DESC])
+            ->all();
+
+        return $rows;
+    }
+
+    /**
+     * find orders by user name
+     * MySQL query SELECT * FROM orders LEFT JOIN users ON orders.user_id=user.id WHERE users.name=$name ORDER BY date_add DESC
+     * @param string $name
+     * @return array
+     */
+    public static function findOrders($name)
+    {
+        $query = new Query();
+
+        $rows = $query->select(['orders.*'])
+            ->from('orders')
+            ->leftJoin('users', 'orders.user_id=user.id')
+            ->where(['users.name' => $name])
+            ->orderBy(['orders.date_add' => SORT_DESC])
             ->all();
 
         return $rows;
@@ -124,6 +144,8 @@ class Order extends \yii\base\Object
     public function deleteProduct($product_id)
     {
         $connection = \Yii::$app->db;
+        $t = time();
+
         $command = $connection->createCommand()
             ->delete('orderrefproducts', [
                 'order_id' => $this->id,
@@ -194,5 +216,23 @@ class Order extends \yii\base\Object
         }
 
         return $result > 0;
+    }
+
+    /**
+   view history of orderders
+     * MySQL query SELECT * FROM logoperations WHERE order_id=$this->id ORDER BY date_add DESC
+     * @return array
+     */
+    public function historyOrder()
+    {
+        $query = new Query();
+
+        $rows = $query->select(['*'])
+            ->from('logoperations')
+            ->where(['id' => $this->id])
+            ->orderBy(['date_add' => SORT_DESC])
+            ->all();
+
+        return $rows;
     }
 }

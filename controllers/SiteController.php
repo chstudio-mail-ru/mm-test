@@ -10,6 +10,8 @@ use yii\filters\VerbFilter;
 use app\models\Product;
 use app\models\Order;
 use app\models\User;
+use app\models\AddProductForm;
+use app\models\AddUserForm;
 
 class SiteController extends Controller
 {
@@ -62,7 +64,24 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        $orders = Order::listOrders();
+
+        print_r($orders);
         return $this->render('index');
+    }
+
+    public function actionRegister()
+    {
+        $model = new RegisterForm();
+
+        if ($model->load(Yii::$app->request->post()) && $model->register(Yii::$app->params['adminEmail'], Yii::$app->params['siteEmail'], Yii::$app->params['siteName'])) {
+            Yii::$app->session->setFlash('registerFormSubmitted');
+
+            return $this->refresh();
+        }
+        return $this->render('register', [
+            'model' => $model,
+        ]);
     }
 
     /**

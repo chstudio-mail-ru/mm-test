@@ -4,17 +4,24 @@ namespace app\models;
 
 use Yii;
 use yii\db\Query;
+use yii\base\Model;
 
 /**
  * Order class for orders.
  */
-class Order extends \yii\db\ActiveRecord
+class Order extends Model
 {
     public $id;
     public $status;
     public $user_id;
+    public $user_name;
     public $date_add;
     public $date_change;
+    public $f_status;
+    public $f_user_id;
+    public $f_sum_min;
+    public $f_sum_max;
+    public $sum;
     public $products;
 
     public static function findIdentity($id)
@@ -31,36 +38,36 @@ class Order extends \yii\db\ActiveRecord
 
     /**
      * list orders
-     * MySQL query SELECT * FROM orders ORDER BY date_add DESC
+     *
      * @return array
      */
-    public static function listOrders()
+    public function listOrders()
     {
         $query = new Query();
 
-        $rows = $query->select(['*'])
+        $query->select(['orders.*', 'SUM(products.price) AS sum', 'users.name AS user_name'])
             ->from('orders')
-            ->orderBy(['date_add' => SORT_DESC])
-            ->all();
+            ->leftJoin('orderrefproducts', "orders.id=orderrefproducts.order_id")
+            ->leftJoin('products', "orderrefproducts.product_id=products.id")
+            ->leftJoin('users', "orders.user_id=users.id");
 
-        return $rows;
-    }
+        if(!empty($this->f_status) && $this->f_status != 'all')
+            $query->andFilterCompare('orders.status', $this->f_status);
+        if(!empty($this->f_user_id) && $this->f_user_id != 0)
+            $query->andFilterCompare('orders.user_id', $this->f_user_id);
 
-    /**
-     * find orders by user name
-     * MySQL query SELECT * FROM orders LEFT JOIN users ON orders.user_id=user.id WHERE users.name=$name ORDER BY date_add DESC
-     * @param string $name
-     * @return array
-     */
-    public static function findOrders($name)
-    {
-        $query = new Query();
+        $query->groupBy('orderrefproducts.order_id');
 
-        $rows = $query->select(['orders.*'])
-            ->from('orders')
-            ->leftJoin('users', 'orders.user_id=user.id')
-            ->where(['users.name' => $name])
-            ->orderBy(['orders.date_add' => SORT_DESC])
+        if(!empty($this->f_sum_min) && !empty($this->f_sum_max))
+        {
+            $query->having(['>=', 'sum',  $this->f_sum_min]);
+            $query->andHaving(['<=', 'sum', $this->f_sum_max]);
+        }
+        elseif(!empty($this->f_sum_min))
+            $query->having(['>=', 'sum', $this->f_sum_min]);
+        elseif(!empty($this->f_sum_max))
+            $query->having(['<=', 'sum', $this->f_sum_max]);
+        $rows = $query->orderBy(['orders.date_add' => SORT_DESC])
             ->all();
 
         return $rows;
@@ -75,7 +82,6 @@ class Order extends \yii\db\ActiveRecord
     {
         return $this->id;
     }
-
 
     /**
      * add new order to DB
@@ -244,5 +250,28 @@ class Order extends \yii\db\ActiveRecord
             ->all();
 
         return $rows;
+    }
+
+    /**
+     * @return array the validation rules.
+     */
+    public function rules()
+    {
+        return [
+            [['f_status', 'f_user_id', 'f_sum_min', 'f_sum_max'], 'safe'],
+        ];
+    }
+
+    /**
+     * @return array customized attribute labels
+     */
+    public function attributeLabels()
+    {
+        return [
+            'f_status' => 'Статус',
+            'f_user_id' => 'Покупатель',
+            'f_sum_min' => 'Минимальная сумма заказа',
+            'f_sum_max' => 'Максимальная сумма заказа',
+        ];
     }
 }

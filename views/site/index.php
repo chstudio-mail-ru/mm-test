@@ -1,53 +1,49 @@
 <?php
 
 /* @var $this yii\web\View */
+/* @var $form yii\bootstrap\ActiveForm */
 
-$this->title = 'Mineral Market test';
+use yii\helpers\Html;
+use yii\bootstrap\ActiveForm;
+
+$this->title = 'Order list';
 ?>
-<div class="site-index">
+<div class="site-about">
+    <h1><?= Html::encode($this->title) ?></h1>
 
-    <div class="jumbotron">
-        <h1>Congratulations!</h1>
-
-        <p class="lead">You have successfully created your Yii-powered application.</p>
-
-        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
-    </div>
-
-    <div class="body-content">
-
-        <div class="row">
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
+    <h3>Фильтр</h3>
+    <div class="row">
+        <div class="col-lg-5">
+            <?php $form = ActiveForm::begin(['id' => 'filter-order-form']); ?>
+            <?= $form->field($model, 'f_status')->dropDownList(['all' => '', 'new' => 'new', 'confirmed' => 'confirmed', 'canceled' => 'canceled', 'closed' => 'closed']); ?>
+            <?= $form->field($model, 'f_user_id')->dropDownList($user_list); ?>
+            <?= $form->field($model, 'f_sum_min') ?>
+            <?= $form->field($model, 'f_sum_max') ?>
+            <div class="form-group">
+                <?= Html::submitButton('Фильтр', ['class' => 'btn btn-primary', 'name' => 'filter-button']) ?>
             </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
-            </div>
+            <?php ActiveForm::end(); ?>
         </div>
-
     </div>
+
+    <?php if (Yii::$app->session->hasFlash('filterFormSubmitted')): ?>
+        <div class="alert alert-success">
+            Применен фильтр
+        </div>
+    <?php endif; ?>
+
+    <h3>Список Orders</h3>
+
+    <table class="table table-bordered">
+        <tr>
+            <th>id</th><th>status</th><th>user name</th><th>sum</th><th>date add</th><th>data change</th><th>edit link</th><th>history link</th>
+        </tr>
+        <? foreach($list_orders as $order):?>
+            <tr>
+                <td><?= $order['id'] ?></td><td><?= $order['status'] ?></td><td><?= $order['user_name'] ?></td><td><?= $order['sum'] ?></td><td><?= $order['date_add'] ?></td><td><?= $order['date_change'] ?></td>
+                <td><a href="/editorder/<?= $order['id'] ?>">edit</a></td>
+                <td><a href="/historyorder/<?= $order['id'] ?>">view</a></td>
+            </tr>
+        <? endforeach; ?>
+    </table>
 </div>

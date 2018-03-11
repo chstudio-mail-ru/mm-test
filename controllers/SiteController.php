@@ -65,11 +65,21 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $model = "";
+        $model = new Order();
+        $userModel = new User();
+        $user_list[0] = "";
+        $user_list = array_merge($user_list, $userModel->listUsers());
+        $user_items = ArrayHelper::map($user_list,'id','name');
 
-        return $this->render('index', [
-            'model' => $model,
-        ]);
+        if ($model->load(Yii::$app->request->post())) {
+            Yii::$app->session->setFlash('filterFormSubmitted');
+            $list_orders = $model->listOrders();
+
+            return $this->render('index', ['model' => $model, 'list_orders' => $list_orders, 'user_list' => $user_items,]);
+        }
+
+        $list_orders = $model->listOrders();
+        return $this->render('index', ['model' => $model, 'list_orders' => $list_orders, 'user_list' => $user_items,]);
     }
 
     /**
@@ -183,7 +193,14 @@ class SiteController extends Controller
         $user_items = ArrayHelper::map($user_list,'id','name');
         $productModel = new Product();
         $product_list = $productModel->listProducts();
-        $product_items = ArrayHelper::map($product_list,'id','name');
+        $product_names = ArrayHelper::map($product_list,'id', 'name');
+        $product_prices = ArrayHelper::map($product_list,'id', 'price');
+        $product_items = [];
+        foreach($product_names as $id=>$name)
+        {
+            $product_items[$id] = $name." - ".$product_prices[$id]." руб.";
+        }
+
 
         if ($model->load(Yii::$app->request->post()) && $model->add()) {
             Yii::$app->session->setFlash('addOrderFormSubmitted');

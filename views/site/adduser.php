@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
     <?php if (Yii::$app->session->hasFlash('addUserFormSubmitted')): ?>
         <div class="alert alert-success">
-            Спасибо за добавление нового User.
+            Спасибо за добавление нового User
         </div>
     <?php else: ?>
         <p>

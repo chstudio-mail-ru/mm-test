@@ -142,17 +142,17 @@ class Product extends Model
     /**
      * save product to DB
      */
-    public function saveProduct()
+    public static function saveProduct($id, $articul, $name, $description, $price, $num)
     {
         $connection = \Yii::$app->db;
         $command = $connection->createCommand()
                                     ->update('products', [
-                                        'articul' => $this->articul,
-                                        'name' => $this->name,
-                                        'description' => $this->description,
-                                        'price' => $this->price,
-                                        'num' => $this->num,
-                                    ], 'id='.$this->id);
+                                        'articul' => $articul,
+                                        'name' => $name,
+                                        'description' => $description,
+                                        'price' => $price,
+                                        'num' => $num,
+                                    ], 'id='.$id);
         $command->execute();
     }
 

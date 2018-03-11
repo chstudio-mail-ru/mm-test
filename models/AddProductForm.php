@@ -10,6 +10,7 @@ use yii\base\Model;
  */
 class AddProductForm extends Model
 {
+    public $id;
     public $articul;
     public $name;
     public $description;
@@ -22,6 +23,7 @@ class AddProductForm extends Model
     public function rules()
     {
         return [
+            [['id'],'number','min'=>1],
             [['articul', 'name', 'description', 'price', 'num'], 'required'],
             [['price'],'number','min'=>1],
             [['num'],'number','min'=>1],
@@ -34,6 +36,7 @@ class AddProductForm extends Model
     public function attributeLabels()
     {
         return [
+            'id'  => '',
             'articul'  => 'Артикул',
             'name'  => 'Название',
             'description'  => 'Описание',
@@ -54,4 +57,36 @@ class AddProductForm extends Model
             return $product;
         }
     }
+
+    /**
+     * load product from table products.
+     * @return Product
+     */
+    public function loadProduct($data)
+    {
+        $product = Product::findIdentity($data);
+
+        $this->id = $product->id;
+        $this->articul = $product->articul;
+        $this->name = $product->name;
+        $this->description = $product->description;
+        $this->price = $product->price;
+        $this->num = $product->num;
+
+        return $this;
+    }
+
+    /**
+     * update product in table products.
+     * @return Product
+     */
+    public function save()
+    {
+        if ($this->validate()) {
+            $product = Product::saveProduct($this->id, $this->articul, $this->name, $this->description, $this->price, $this->num);
+
+            return $product;
+        }
+    }
+
 }

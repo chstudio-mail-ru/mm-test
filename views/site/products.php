@@ -38,11 +38,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <table class="table table-bordered">
         <tr>
-            <th>id</th><th>articul</th><th>name</th><th>description</th><th>price</th><th>num</th>
+            <th>id</th><th>articul</th><th>name</th><th>description</th><th>price</th><th>num</th><th>edit link</th>
         </tr>
         <? foreach($list_products as $product):?>
         <tr>
             <td><?= $product['id'] ?></td><td><?= $product['articul'] ?></td><td><?= $product['name'] ?></td><td><?= $product['description'] ?></td><td><?= $product['price'] ?></td><td><?= $product['num'] ?></td>
+            <td><a href="/editproduct/<?= $product['id'] ?>">edit</a></td>
         </tr>
         <? endforeach; ?>
     </table>

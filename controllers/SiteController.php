@@ -125,6 +125,27 @@ class SiteController extends Controller
     }
 
     /**
+     * Displays form for save product.
+     *
+     * @return string
+     */
+    public function actionEditproduct()
+    {
+        $model = new AddProductForm();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        } elseif (Yii::$app->request->get('id') > 0 && $model->loadProduct(Yii::$app->request->get('id'))) {
+            return $this->render('editproduct', [
+                'model' => $model,
+            ]);
+        }
+
+        return $this->render('editproduct', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
      * Displays list of products.
      *
      * @return string

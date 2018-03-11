@@ -8,7 +8,7 @@ use yii\db\Query;
 /**
  * Product class for products.
  */
-class Product extends \yii\base\Object
+class Product extends \yii\db\ActiveRecord
 {
     public $id;
     public $articul;
@@ -31,19 +31,26 @@ class Product extends \yii\base\Object
     }
 
     /**
-     * find orders by user name
-     * MySQL query SELECT * FROM orders LEFT JOIN users ON orders.user_id=user.id WHERE users.name=$name ORDER BY orders.date_add DESC
+     * @return string
+     */
+    public static function tableName()
+    {
+        return 'products';
+    }
+
+    /**
+     * find products by user name
+     * MySQL query SELECT * FROM products WHERE name=$name
      * @param string $name
      * @return array
      */
-    public static function findOrderedProductsByUserName($name)
+    public static function findProductsByName($name)
     {
         $query = new Query();
 
         $rows = $query->select(['*'])
             ->from('products')
             ->where(['name' => $name])
-            ->andWhere(['>=', 'num', 0])
             ->all();
 
         return $rows;
@@ -59,7 +66,6 @@ class Product extends \yii\base\Object
         return $this->id;
     }
 
-
     /**
      * add new product to DB
      * MySQL query INSERT INTO products (articul, name, description, price, num) VALUES ($articul, $name, $description, $price, $num)
@@ -70,6 +76,7 @@ class Product extends \yii\base\Object
      * @param  integer $num
      * @return static|null
      */
+
     public static function addProduct($articul, $name, $description, $price, $num)
     {
         $connection = \Yii::$app->db;
@@ -107,7 +114,7 @@ class Product extends \yii\base\Object
         $rows = $query->select(['*'])
             ->from('products')
             ->where(['>=', 'num', 1])
-            ->orderBy(['name' => SORT_ASC])
+            ->orderBy(['id' => SORT_DESC])
             ->all();
 
         return $rows;
@@ -139,4 +146,6 @@ class Product extends \yii\base\Object
         $command = $connection->createCommand('UPDATE products SET num=num-1 WHERE id='.intval($this->id));
         $command->execute();
     }
+
+
 }

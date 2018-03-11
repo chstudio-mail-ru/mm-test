@@ -23,7 +23,6 @@ class AddProductForm extends Model
     {
         return [
             [['articul', 'name', 'description', 'price', 'num'], 'required'],
-            ['articul', 'unique'],
             [['price'],'number','min'=>1],
             [['num'],'number','min'=>1],
        ];

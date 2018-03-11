@@ -58,119 +58,82 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays homepage.
+     * Displays homepage - order list.
      *
      * @return string
      */
     public function actionIndex()
     {
-        $orders = Order::listOrders();
+        $model = "";
 
-        print_r($orders);
-        return $this->render('index');
-    }
-
-    public function actionRegister()
-    {
-        $model = new RegisterForm();
-
-        if ($model->load(Yii::$app->request->post()) && $model->register(Yii::$app->params['adminEmail'], Yii::$app->params['siteEmail'], Yii::$app->params['siteName'])) {
-            Yii::$app->session->setFlash('registerFormSubmitted');
-
-            return $this->refresh();
-        }
-        return $this->render('register', [
+        return $this->render('index', [
             'model' => $model,
         ]);
     }
 
     /**
-     * Login action.
-     *
-     * @return Response|string
-     */
-    public function actionLogin()
-    {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
-        }
-
-        $model->password = '';
-        return $this->render('login', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Logout action.
-     *
-     * @return Response
-     */
-    public function actionLogout()
-    {
-        Yii::$app->user->logout();
-
-        return $this->goHome();
-    }
-
-    /**
-     * Displays contact page.
-     *
-     * @return Response|string
-     */
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
-
-            return $this->refresh();
-        }
-        return $this->render('contact', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Displays about page.
+     * Displays form for add new user.
      *
      * @return string
      */
-    public function actionAbout()
+    public function actionAdduser()
     {
-        return $this->render('about');
-    }
+        $model = new AddUserForm();
 
-    /**
-     * Displays form page.
-     *
-     * @return string
-     */
-    public function actionForm()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
+        if ($model->load(Yii::$app->request->post()) && $model->add()) {
+            Yii::$app->session->setFlash('addUserFormSubmitted');
 
             return $this->refresh();
         }
-        return $this->render('form', [
+
+        return $this->render('adduser', [
             'model' => $model,
         ]);
     }
 
     /**
-     * Ajax index page.
+     * Displays list of all product.
      *
      * @return string
      */
-    public function actionAjax()
+    public function actionUsers()
     {
-        return $this->render('index');
+        $model = new User();
+        $list_users = $model->listUsers();
+
+        return $this->render('users', ['model' => $model, 'list_users' => $list_users]);
+    }
+
+    /**
+     * Displays form for add new product.
+     *
+     * @return string
+     */
+    public function actionAddproduct()
+    {
+        $model = new AddProductForm();
+
+        if ($model->load(Yii::$app->request->post()) && $model->add()) {
+            Yii::$app->session->setFlash('addProductFormSubmitted');
+
+            return $this->refresh();
+        }
+
+        return $this->render('addproduct', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * Displays list of all product.
+     *
+     * @return string
+     */
+    public function actionProducts()
+    {
+        $model = new Product();
+        $list_products = $model->listProducts();
+
+        return $this->render('products', ['model' => $model, 'list_products' => $list_products]);
     }
 }

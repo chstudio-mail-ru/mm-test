@@ -8,7 +8,7 @@ use yii\db\Query;
 /**
  * Order class for orders.
  */
-class Order extends \yii\base\Object
+class Order extends \yii\db\ActiveRecord
 {
     public $id;
     public $status;
@@ -85,7 +85,7 @@ class Order extends \yii\base\Object
     public static function addOrder($user_id = null)
     {
         $connection = \Yii::$app->db;
-        $t = time();
+        $t = date("Y-m-d H:i:s", time());
 
         $command = $connection->createCommand()
                                     ->insert('orders', [
@@ -114,7 +114,7 @@ class Order extends \yii\base\Object
     public function addProduct($product_id)
     {
         $connection = \Yii::$app->db;
-        $t = time();
+        $t = date("Y-m-d H:i:s", time());
 
         $command = $connection->createCommand()
             ->insert('orderrefproducts', [
@@ -144,7 +144,7 @@ class Order extends \yii\base\Object
     public function deleteProduct($product_id)
     {
         $connection = \Yii::$app->db;
-        $t = time();
+        $t = date("Y-m-d H:i:s", time());
 
         $command = $connection->createCommand()
             ->delete('orderrefproducts', [
@@ -191,7 +191,7 @@ class Order extends \yii\base\Object
     public function changeStatus($status)
     {
         $connection = \Yii::$app->db;
-        $t = time();
+        $t = date("Y-m-d H:i:s", time());
         $result = 0;
 
         if(in_array($status,  ['new', 'confirmed', 'canceled', 'closed']))

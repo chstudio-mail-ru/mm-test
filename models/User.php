@@ -69,6 +69,23 @@ class User extends \yii\base\Object
     }
 
     /**
+     * list users
+     * MySQL query SELECT * FROM users ORDER BY date_add DESC
+     * @return array
+     */
+    public function listUsers()
+    {
+        $query = new Query();
+
+        $rows = $query->select(['*'])
+            ->from('users')
+            ->orderBy(['date_add' => SORT_DESC])
+            ->all();
+
+        return $rows;
+    }
+
+    /**
      * save user to DB
      */
     public function saveUser()

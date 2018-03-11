@@ -4,11 +4,12 @@ namespace app\models;
 
 use Yii;
 use yii\db\Query;
+use yii\base\Model;
 
 /**
  * Product class for products.
  */
-class Product extends \yii\db\ActiveRecord
+class Product extends Model
 {
     public $id;
     public $articul;
@@ -16,6 +17,12 @@ class Product extends \yii\db\ActiveRecord
     public $description;
     public $price;
     public $num;
+    public $f_articul;
+    public $f_name;
+    public $f_description;
+    public $f_price_min;
+    public $f_price_max;
+
 
     public static function findIdentity($id)
     {
@@ -103,7 +110,7 @@ class Product extends \yii\db\ActiveRecord
     }
 
     /**
-     * list products
+     * list all available filtered products
      * MySQL query SELECT * FROM products WHERE num>=1 ORDER BY name
      * @return array
      */
@@ -111,10 +118,22 @@ class Product extends \yii\db\ActiveRecord
     {
         $query = new Query();
 
-        $rows = $query->select(['*'])
+        $query->select(['*'])
             ->from('products')
-            ->where(['>=', 'num', 1])
-            ->orderBy(['id' => SORT_DESC])
+            ->where(['>=', 'num', 1]);
+
+        if(!empty($this->f_articul))
+            $query->andFilterCompare('articul', $this->f_articul);
+        if(!empty($this->f_name))
+            $query->andFilterCompare('name', $this->f_name);
+        if(!empty($this->f_description))
+            $query->andFilterCompare('description', $this->f_description, 'like');
+        if(!empty($this->f_price_min))
+            $query->andFilterCompare('price', '>='.$this->f_price_min);
+        if(!empty($this->f_price_max))
+            $query->andFilterCompare('price', '<='.$this->f_price_max);
+
+        $rows = $query->orderBy(['id' => SORT_DESC])
             ->all();
 
         return $rows;
@@ -147,5 +166,27 @@ class Product extends \yii\db\ActiveRecord
         $command->execute();
     }
 
+    /**
+     * @return array the validation rules.
+     */
+    public function rules()
+    {
+        return [
+            [['f_articul', 'f_name', 'f_description', 'f_price_min', 'f_price_max'], 'safe'],
+        ];
+    }
 
+    /**
+     * @return array customized attribute labels
+     */
+    public function attributeLabels()
+    {
+        return [
+            'f_articul' => 'Артикул',
+            'f_name' => 'Название',
+            'f_description' => 'Описание содержит',
+            'f_price_min' => 'Минимальная цена',
+            'f_price_max' => 'Максимальная цена',
+        ];
+    }
 }

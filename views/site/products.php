@@ -1,8 +1,10 @@
 <?php
 
 /* @var $this yii\web\View */
+/* @var $form yii\bootstrap\ActiveForm */
 
 use yii\helpers\Html;
+use yii\bootstrap\ActiveForm;
 
 $this->title = 'Products';
 $this->params['breadcrumbs'][] = $this->title;
@@ -10,9 +12,29 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="site-about">
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
-        Список Products
-    </p>
+    <h3>Фильтр</h3>
+    <div class="row">
+        <div class="col-lg-5">
+            <?php $form = ActiveForm::begin(['id' => 'filter-product-form']); ?>
+            <?= $form->field($model, 'f_articul') ?>
+            <?= $form->field($model, 'f_name') ?>
+            <?= $form->field($model, 'f_description') ?>
+            <?= $form->field($model, 'f_price_min') ?>
+            <?= $form->field($model, 'f_price_max') ?>
+            <div class="form-group">
+                <?= Html::submitButton('Фильтр', ['class' => 'btn btn-primary', 'name' => 'filter-button']) ?>
+            </div>
+            <?php ActiveForm::end(); ?>
+        </div>
+    </div>
+
+    <?php if (Yii::$app->session->hasFlash('filterFormSubmitted')): ?>
+        <div class="alert alert-success">
+            Применен фильтр
+        </div>
+    <?php endif; ?>
+
+    <h3>Список Products</h3>
 
     <table class="table table-bordered">
         <tr>

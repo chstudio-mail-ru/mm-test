@@ -92,7 +92,7 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays list of all product.
+     * Displays list of all users.
      *
      * @return string
      */
@@ -125,15 +125,22 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays list of all product.
+     * Displays list of products.
      *
      * @return string
      */
     public function actionProducts()
     {
         $model = new Product();
-        $list_products = $model->listProducts();
 
+        if ($model->load(Yii::$app->request->post())) {
+            Yii::$app->session->setFlash('filterFormSubmitted');
+            $list_products = $model->listProducts();
+
+            return $this->render('products', ['model' => $model, 'list_products' => $list_products]);
+        }
+
+        $list_products = $model->listProducts();
         return $this->render('products', ['model' => $model, 'list_products' => $list_products]);
     }
 }

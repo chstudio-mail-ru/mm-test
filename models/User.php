@@ -4,11 +4,12 @@ namespace app\models;
 
 use Yii;
 use yii\db\Query;
+use yii\base\Model;
 
 /**
- * User class for athenticated users.
+ * User class for working with users.
  */
-class User extends \yii\base\Object
+class User extends Model
 {
     public $id;
     public $name;

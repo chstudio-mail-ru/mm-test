@@ -11,6 +11,11 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-product">
     <h1><?= Html::encode($this->title) ?></h1>
+    <?php if (Yii::$app->session->hasFlash('saveProductFormSubmitted')): ?>
+        <div class="alert alert-success">
+            Product сохранен
+        </div>
+    <?php endif; ?>
         <p>
             Редактировать Product
         </p>

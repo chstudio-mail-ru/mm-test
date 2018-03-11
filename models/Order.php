@@ -15,6 +15,7 @@ class Order extends \yii\db\ActiveRecord
     public $user_id;
     public $date_add;
     public $date_change;
+    public $products;
 
     public static function findIdentity($id)
     {
@@ -22,7 +23,7 @@ class Order extends \yii\db\ActiveRecord
 
         $row = $query->select(['*'])
                      ->from('orders')
-                     ->where(['id' => intval($id)])
+                     ->where(['id' => $id])
                      ->one();
 
         return isset($row['id'])? new static($row) : null;
@@ -82,25 +83,31 @@ class Order extends \yii\db\ActiveRecord
      * @param  integer $user_id
      * @return static|null
      */
-    public static function addOrder($user_id = null)
+    public static function addOrder($user_id, $products)
     {
         $connection = \Yii::$app->db;
         $t = date("Y-m-d H:i:s", time());
 
         $command = $connection->createCommand()
                                     ->insert('orders', [
-                                        'user_id' => intval($user_id),
+                                        'user_id' => $user_id,
                                         'date_add' => $t,
                                     ]);
         $command->execute();
         $id = $connection->getLastInsertID();
 
+        self::changeStatus($id, 'new');
+        foreach($products as $product_id)
+        {
+            self::addProduct($id, $product_id);
+        }
+
         $arr =  [
                     'id' => $id,
                     'status' => 'new',
-                    'user_id' => intval($user_id),
+                    'user_id' => $user_id,
                     'date_add' => $t,
-                    'date_change' => null,
+                    'date_change' => $t,
                 ];
         return new static($arr);
     }
@@ -108,18 +115,19 @@ class Order extends \yii\db\ActiveRecord
     /**
      * add product to order
      * MySQL query INSERT INTO orderrefproducts (order_id, product_id) VALUES ($this->id, $product_id)
-     * @param  integer $product_id
+     * @param integer $id
+     * @param integer $product_id
      * @return boolean
      */
-    public function addProduct($product_id)
+    public static function addProduct($id, $product_id)
     {
         $connection = \Yii::$app->db;
         $t = date("Y-m-d H:i:s", time());
 
         $command = $connection->createCommand()
             ->insert('orderrefproducts', [
-                'order_id' => $this->id,
-                'product_id' => intval($product_id),
+                'order_id' => $id,
+                'product_id' => $product_id,
             ]);
         $result = $command->execute();
 
@@ -128,7 +136,7 @@ class Order extends \yii\db\ActiveRecord
             $command = $connection->createCommand()
                 ->update('orders', [
                     'date_change' => $t,
-                ], 'id=' . $this->id);
+                ], 'id=' . $id);
             $command->execute();
         }
 
@@ -149,7 +157,7 @@ class Order extends \yii\db\ActiveRecord
         $command = $connection->createCommand()
             ->delete('orderrefproducts', [
                 'order_id' => $this->id,
-                'product_id' => intval($product_id),
+                'product_id' => $product_id,
             ]);
         $result = $command->execute();
 
@@ -185,31 +193,33 @@ class Order extends \yii\db\ActiveRecord
     /**
      * change order status and add to log it
      * MySQL query INSERT INTO logoperations (operation) VALUES ($status)
+     * @param integer $id
      * @param string $status ('new', 'confirmed', 'canceled', 'closed')
      * @return boolean
      */
-    public function changeStatus($status)
+    public static function changeStatus($id, $status)
     {
         $connection = \Yii::$app->db;
         $t = date("Y-m-d H:i:s", time());
         $result = 0;
 
-        if(in_array($status,  ['new', 'confirmed', 'canceled', 'closed']))
+
+        if(in_array($status, ['new', 'confirmed', 'canceled', 'closed']))
         {
             $command = $connection->createCommand()
                 ->update('orders', [
                     'status' => $status,
                     'date_change' => $t,
-                ], 'id='.$this->id);
+                ], 'id='.$id);
             $result = $command->execute();
 
             if($result > 0)
             {
                 $command = $connection->createCommand()
                     ->insert('logoperations', [
-                        'order_id' => $this->id,
+                        'order_id' => $id,
                         'date_add' => $t,
-                        'operation' => "change status to ".$status,
+                        'operation' => "changed status to ".$status,
                     ]);
                 $command->execute();
             }
@@ -219,17 +229,17 @@ class Order extends \yii\db\ActiveRecord
     }
 
     /**
-   view history of orderders
+     * view history of order
      * MySQL query SELECT * FROM logoperations WHERE order_id=$this->id ORDER BY date_add DESC
      * @return array
      */
-    public function historyOrder()
+    public static function historyOrder($id)
     {
         $query = new Query();
 
         $rows = $query->select(['*'])
             ->from('logoperations')
-            ->where(['id' => $this->id])
+            ->where(['id' => $id])
             ->orderBy(['date_add' => SORT_DESC])
             ->all();
 

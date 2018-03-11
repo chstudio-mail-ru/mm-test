@@ -30,47 +30,11 @@ class Product extends Model
 
         $row = $query->select(['*'])
                      ->from('products')
-                     ->where(['id' => intval($id)])
+                     ->where(['id' => $id])
                      ->one();
 
-        
+
         return isset($row['id'])? new static($row) : null;
-    }
-
-    /**
-     * @return string
-     */
-    public static function tableName()
-    {
-        return 'products';
-    }
-
-    /**
-     * find products by user name
-     * MySQL query SELECT * FROM products WHERE name=$name
-     * @param string $name
-     * @return array
-     */
-    public static function findProductsByName($name)
-    {
-        $query = new Query();
-
-        $rows = $query->select(['*'])
-            ->from('products')
-            ->where(['name' => $name])
-            ->all();
-
-        return $rows;
-    }
-
-    /**
-     * @inheritdoc
-     * take product $id
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
     }
 
     /**
@@ -162,7 +126,17 @@ class Product extends Model
     public function decrement()
     {
         $connection = \Yii::$app->db;
-        $command = $connection->createCommand('UPDATE products SET num=num-1 WHERE id='.intval($this->id));
+        $command = $connection->createCommand('UPDATE products SET num=num-1 WHERE id='.$this->id);
+        $command->execute();
+    }
+
+    /**
+     * increment products num
+     */
+    public function increment()
+    {
+        $connection = \Yii::$app->db;
+        $command = $connection->createCommand('UPDATE products SET num=num+1 WHERE id='.$this->id);
         $command->execute();
     }
 

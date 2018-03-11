@@ -5,12 +5,13 @@ namespace app\controllers;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
-use yii\web\Response;
+use yii\helpers\ArrayHelper;
 use yii\filters\VerbFilter;
 use app\models\Product;
-use app\models\Order;
-use app\models\User;
 use app\models\AddProductForm;
+use app\models\Order;
+use app\models\AddOrderForm;
+use app\models\User;
 use app\models\AddUserForm;
 
 class SiteController extends Controller
@@ -134,12 +135,16 @@ class SiteController extends Controller
         $model = new AddProductForm();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-        } elseif (Yii::$app->request->get('id') > 0 && $model->loadProduct(Yii::$app->request->get('id'))) {
+            return $this->refresh();
+        }
+
+        if (Yii::$app->request->get('id') > 0 && !Yii::$app->request->post() && $model->loadProduct(Yii::$app->request->get('id'))) {
             return $this->render('editproduct', [
                 'model' => $model,
             ]);
         }
 
+        Yii::$app->session->setFlash('saveProductFormSubmitted');
         return $this->render('editproduct', [
             'model' => $model,
         ]);
@@ -163,5 +168,33 @@ class SiteController extends Controller
 
         $list_products = $model->listProducts();
         return $this->render('products', ['model' => $model, 'list_products' => $list_products]);
+    }
+
+    /**
+     * Displays form for add new order.
+     *
+     * @return string
+     */
+    public function actionAddorder()
+    {
+        $model = new AddOrderForm();
+        $userModel = new User();
+        $user_list = $userModel->listUsers();
+        $user_items = ArrayHelper::map($user_list,'id','name');
+        $productModel = new Product();
+        $product_list = $productModel->listProducts();
+        $product_items = ArrayHelper::map($product_list,'id','name');
+
+        if ($model->load(Yii::$app->request->post()) && $model->add()) {
+            Yii::$app->session->setFlash('addOrderFormSubmitted');
+
+            return $this->refresh();
+        }
+
+        return $this->render('addorder', [
+            'model' => $model,
+            'user_list' => $user_items,
+            'product_list' => $product_items,
+        ]);
     }
 }

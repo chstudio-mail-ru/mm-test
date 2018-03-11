@@ -50,7 +50,7 @@ class User extends Model
     public static function addUser($username, $useremail)
     {
         $connection = \Yii::$app->db;
-        $t = time();
+        $t = date("Y-m-d H:i:s", time());
         $command = $connection->createCommand()
                                     ->insert('users', [
                                         'name' => $username,
@@ -78,7 +78,7 @@ class User extends Model
     {
         $query = new Query();
 
-        $rows = $query->select(['*'])
+        $rows = $query->select(['id', 'name'])
             ->from('users')
             ->orderBy(['date_add' => SORT_DESC])
             ->all();

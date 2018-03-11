@@ -6,7 +6,7 @@ use Yii;
 use yii\base\Model;
 
 /**
- * RegisterForm is the model behind the register form.
+ * AddUserForm is the model behind the add user form.
  */
 class AddUserForm extends Model
 {

@@ -6,7 +6,7 @@ use Yii;
 use yii\base\Model;
 
 /**
- * ProductForm is the model behind the add product form.
+ * AddProductForm is the model behind the add product form.
  */
 class AddProductForm extends Model
 {
@@ -62,9 +62,9 @@ class AddProductForm extends Model
      * load product from table products.
      * @return Product
      */
-    public function loadProduct($data)
+    public function loadProduct($id)
     {
-        $product = Product::findIdentity($data);
+        $product = Product::findIdentity($id);
 
         $this->id = $product->id;
         $this->articul = $product->articul;

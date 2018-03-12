@@ -229,6 +229,7 @@ class SiteController extends Controller
         $product_list = $productModel->listProducts();
         $product_names = ArrayHelper::map($product_list,'id', 'name');
         $product_prices = ArrayHelper::map($product_list,'id', 'price');
+        //$product_items = [3 => "item3", 4 => "item4"];
         $product_items = [];
         foreach($product_names as $id=>$name)
         {
@@ -244,6 +245,7 @@ class SiteController extends Controller
             $delete_product_list = Order::listProducts(Yii::$app->request->get('id'));
             $delete_product_names = ArrayHelper::map($delete_product_list,'id', 'name');
             $delete_product_prices = ArrayHelper::map($delete_product_list,'id', 'price');
+            //$delete_product_items = [1 => "item1", 2 => "item2"];
             $delete_product_items = [];
             foreach($delete_product_names as $id=>$name)
             {
@@ -253,8 +255,8 @@ class SiteController extends Controller
                 'model' => $model,
                 'status' => $model->status,
                 'user_list' => $user_items,
-                'delete_product_list' => $delete_product_names,
-                'add_product_list' => $product_names,
+                'delete_product_list' => $delete_product_items,
+                'add_product_list' => $product_items,
             ]);
         }
         else
@@ -266,8 +268,8 @@ class SiteController extends Controller
             'model' => $model,
             'status' => $model->status,
             'user_list' => $user_items,
-            'delete_product_list' => $delete_product_names,
-            'add_product_list' => $product_names,
+            'delete_product_list' => $delete_product_items,
+            'add_product_list' => $product_items,
         ]);
     }
 }

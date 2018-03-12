@@ -25,8 +25,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= $form->field($model, 'id')->hiddenInput() ?>
                     <?= $form->field($model, 'user_id')->dropDownList($user_list); ?>
                     <?= $form->field($model, 'status')->dropDownList(['confirmed'=>'confirmed','canceled'=>'canceled','closed'=>'closed','new'=>'new']); ?>
-                    <?= $form->field($model, 'delete_products')->dropDownList($delete_product_list, ['multiple'=>'multiple', 'style' => 'height:200px;']); ?>
-                    <?= $form->field($model, 'add_products')->dropDownList($add_product_list, ['multiple'=>'multiple', 'style' => 'height:300px;']); ?>
+                    <?php /* <?= $form->field($model, 'delete_products')->dropDownList($delete_product_list, ['multiple'=>'multiple', 'style' => 'height:200px;']); ?> */ ?>
+                    <?php /* <?= $form->field($model, 'add_products')->dropDownList($add_product_list, ['multiple'=>'multiple', 'style' => 'height:300px;']); ?> */ ?>
                     <div class="form-group">
                         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary', 'name' => 'save-button']) ?>
                     </div>

@@ -235,6 +235,15 @@ class SiteController extends Controller
         {
             $product_items[$id] = $name." - ".$product_prices[$id]." руб.";
         }
+        $delete_product_list = Order::listProducts(Yii::$app->request->get('id'));
+        $delete_product_names = ArrayHelper::map($delete_product_list,'id', 'name');
+        $delete_product_prices = ArrayHelper::map($delete_product_list,'id', 'price');
+        //$delete_product_items = [1 => "item1", 2 => "item2"];
+        $delete_product_items = [];
+        foreach($delete_product_names as $id=>$name)
+        {
+            $delete_product_items[$id] = $name." - ".$delete_product_prices[$id]." руб.";
+        }
 
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -242,15 +251,6 @@ class SiteController extends Controller
         }
 
         if (Yii::$app->request->get('id') > 0 && !Yii::$app->request->post() && $model->loadOrder(Yii::$app->request->get('id'))) {
-            $delete_product_list = Order::listProducts(Yii::$app->request->get('id'));
-            $delete_product_names = ArrayHelper::map($delete_product_list,'id', 'name');
-            $delete_product_prices = ArrayHelper::map($delete_product_list,'id', 'price');
-            //$delete_product_items = [1 => "item1", 2 => "item2"];
-            $delete_product_items = [];
-            foreach($delete_product_names as $id=>$name)
-            {
-                $delete_product_items[$id] = $name." - ".$delete_product_prices[$id]." руб.";
-            }
             return $this->render('editorder', [
                 'model' => $model,
                 'status' => $model->status,
@@ -258,10 +258,6 @@ class SiteController extends Controller
                 'delete_product_list' => $delete_product_items,
                 'add_product_list' => $product_items,
             ]);
-        }
-        else
-        {
-            $delete_product_items = [];
         }
 
         return $this->render('editorder', [

@@ -25,8 +25,28 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= $form->field($model, 'id')->hiddenInput() ?>
                     <?= $form->field($model, 'user_id')->dropDownList($user_list); ?>
                     <?= $form->field($model, 'status')->dropDownList(['confirmed'=>'confirmed','canceled'=>'canceled','closed'=>'closed','new'=>'new']); ?>
-                    <?php /* <?= $form->field($model, 'delete_products')->dropDownList($delete_product_list, ['multiple'=>'multiple', 'style' => 'height:200px;']); ?> */ ?>
-                    <?php /* <?= $form->field($model, 'add_products')->dropDownList($add_product_list, ['multiple'=>'multiple', 'style' => 'height:300px;']); ?> */ ?>
+                Удалить товары
+                <table class="table table-bordered">
+                    <tr>
+                        <th>id</th><th>name - price</th><th>remove link</th>
+                    </tr>
+                    <? foreach($delete_product_list as $id => $product):?>
+                        <tr>
+                            <td><?= $id; ?></td><td><?= $product ?></td><td><a href="/removefromorder/<?= $id ?>">remove</a></td>
+                        </tr>
+                    <? endforeach; ?>
+                </table>
+                Добавить товары
+                <table class="table table-bordered">
+                    <tr>
+                        <th>id</th><th>name - price</th><th>add link</th>
+                    </tr>
+                    <? foreach($add_product_list as $id => $product):?>
+                        <tr>
+                            <td><?= $id; ?></td><td><?= $product ?></td><td><a href="/addtoorder/<?= $id ?>">add</a></td>
+                        </tr>
+                    <? endforeach; ?>
+                </table>
                     <div class="form-group">
                         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary', 'name' => 'save-button']) ?>
                     </div>

@@ -42,7 +42,7 @@ class AddOrderForm extends Model
             'user_id'  => 'Пользователь',
             'status'  => 'Статус заказа',
             'delete_products'  => 'Удалить товары',
-            'add_products'  => 'Добавить товары',
+            'products'  => 'Добавить товары',
         ];
     }
 

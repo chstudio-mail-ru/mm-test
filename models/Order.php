@@ -123,7 +123,7 @@ class Order extends Model
             ->update('orders', [
                 'user_id' => $user_id,
                 'date_change' => $t,
-            ]);
+            ], 'id='.$id);
         $command->execute();
 
         self::changeStatus($id, $status);

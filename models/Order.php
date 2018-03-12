@@ -74,16 +74,6 @@ class Order extends Model
     }
 
     /**
-     * @inheritdoc
-     * take order $id
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
      * add new order to DB
      * MySQL query INSERT INTO orders (user_id) VALUES ($user_id)
      * @param  integer $user_id
@@ -103,9 +93,12 @@ class Order extends Model
         $id = $connection->getLastInsertID();
 
         self::changeStatus($id, 'new');
-        foreach($products as $product_id)
+        if(is_array($products))
         {
-            self::addProduct($id, $product_id);
+            foreach ($products as $product_id)
+            {
+                self::addProduct($id, $product_id);
+            }
         }
 
         $arr =  [
@@ -119,8 +112,40 @@ class Order extends Model
     }
 
     /**
+     * save product to DB
+     */
+    public static function saveOrder($id, $user_id, $status, $add_products, $delete_products)
+    {
+        $connection = \Yii::$app->db;
+        $t = date("Y-m-d H:i:s", time());
+
+        $command = $connection->createCommand()
+            ->update('orders', [
+                'user_id' => $user_id,
+                'date_change' => $t,
+            ]);
+        $command->execute();
+
+        self::changeStatus($id, $status);
+        if(is_array($add_products))
+        {
+            foreach($add_products as $product_id)
+            {
+                self::addProduct($id, $product_id);
+            }
+        }
+        if(is_array($delete_products))
+        {
+            foreach($delete_products as $product_id)
+            {
+                self::deleteProduct($id, $product_id);
+            }
+        }
+    }
+
+    /**
      * add product to order
-     * MySQL query INSERT INTO orderrefproducts (order_id, product_id) VALUES ($this->id, $product_id)
+     * MySQL query INSERT INTO orderrefproducts (order_id, product_id) VALUES ($id, $product_id)
      * @param integer $id
      * @param integer $product_id
      * @return boolean
@@ -151,18 +176,19 @@ class Order extends Model
 
     /**
      * delete product from order
-     * MySQL query DELETE FROM orderrefproducts WHERE order_id=$this->id AND product_id=$product_id)
+     * MySQL query DELETE FROM orderrefproducts WHERE order_id=$id AND product_id=$product_id)
+     * @param  integer $id
      * @param  integer $product_id
      * @return boolean
      */
-    public function deleteProduct($product_id)
+    public static function deleteProduct($id, $product_id)
     {
         $connection = \Yii::$app->db;
         $t = date("Y-m-d H:i:s", time());
 
         $command = $connection->createCommand()
             ->delete('orderrefproducts', [
-                'order_id' => $this->id,
+                'order_id' => $id,
                 'product_id' => $product_id,
             ]);
         $result = $command->execute();
@@ -172,7 +198,7 @@ class Order extends Model
             $command = $connection->createCommand()
                 ->update('orders', [
                     'date_change' => $t,
-                ], 'id=' . $this->id);
+                ], 'id=' . $id);
             $command->execute();
         }
 
@@ -181,17 +207,29 @@ class Order extends Model
 
     /**
      * list products ids of order
-     * MySQL query SELECT product_id FROM orderrefproducts WHERE order_id=$this->id
+     * MySQL query SELECT product_id FROM orderrefproducts WHERE order_id=$id
+     * @param  integer $id
      * @return array
      */
-    public function listProducts()
+    public static function listProducts($id)
     {
         $query = new Query();
 
-        $rows = $query->select(['product_id'])
-            ->from('orderrefproducts')
-            ->where(['id' => $this->id])
-            ->all();
+        if($id > 0)
+        {
+            $rows = $query->select(['orderrefproducts.product_id AS id', 'products.name AS name', 'products.price AS price'])
+                ->from('orderrefproducts')
+                ->leftJoin('products', 'orderrefproducts.product_id=products.id')
+                ->where(['orderrefproducts.order_id' => $id])
+                ->all();
+        }
+        else
+        {
+            $rows = $query->select(['name', 'price'])
+                ->from('products')
+                ->where(['num' => '>0'])
+                ->all();
+        }
 
         return $rows;
     }

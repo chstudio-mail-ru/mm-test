@@ -21,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </p>
         <div class="row">
             <div class="col-lg-5">
-                <?php $form = ActiveForm::begin(['id' => 'add-product-form']); ?>
+                <?php $form = ActiveForm::begin(['id' => 'add-order-form']); ?>
                     <?= $form->field($model, 'user_id')->dropDownList($user_list); ?>
                     <?= $form->field($model, 'products')->dropDownList($product_list, ['multiple'=>'multiple', 'style' => 'height:500px;']); ?>
                     <div class="form-group">

@@ -11,8 +11,11 @@ use yii\base\Model;
 class AddOrderForm extends Model
 {
     public $id;
+    public $status;
     public $user_id;
     public $products;
+    public $add_products;
+    public $delete_products;
 
     /**
      * @return array the validation rules.
@@ -21,8 +24,11 @@ class AddOrderForm extends Model
     {
         return [
             [['id'],'number','min'=>1],
+            ['status','in','range'=>['new','confirmed','canceled','closed']],
             [['user_id'],'number','min'=>1],
             ['products', 'each', 'rule' => ['integer']],
+            ['add_products', 'each', 'rule' => ['integer']],
+            ['delete_products', 'each', 'rule' => ['integer']],
        ];
     }
 
@@ -34,7 +40,9 @@ class AddOrderForm extends Model
         return [
             'id'  => '',
             'user_id'  => 'Пользователь',
-            'products'  => 'Товары',
+            'status'  => 'Статус заказа',
+            'delete_products'  => 'Удалить товары',
+            'add_products'  => 'Добавить товары',
         ];
     }
 
@@ -51,4 +59,35 @@ class AddOrderForm extends Model
         }
     }
 
+    /**
+     * load order from table orders.
+     * @param  integer $id
+     * @return Order
+     */
+    public function loadOrder($id)
+    {
+        $order = Order::findIdentity($id);
+
+        $this->id = $order->id;
+        $this->user_id = $order->user_id;
+        $this->status = $order->status;
+        $this->delete_products = Order::listProducts($order->id);
+        $this->add_products = Order::listProducts(0);
+        $this->products = Order::listProducts(0);
+
+        return $this;
+    }
+
+    /**
+     * update order in table orders.
+     * @return Order
+     */
+    public function save()
+    {
+        if ($this->validate()) {
+            $order = Order::saveOrder($this->id, $this->user_id, $this->status,  $this->delete_products, $this->add_products);
+
+            return $order;
+        }
+    }
 }

@@ -88,5 +88,4 @@ class AddProductForm extends Model
             return $product;
         }
     }
-
 }

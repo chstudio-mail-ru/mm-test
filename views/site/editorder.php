@@ -26,24 +26,28 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= $form->field($model, 'user_id')->dropDownList($user_list); ?>
                     <?= $form->field($model, 'status')->dropDownList(['confirmed'=>'confirmed','canceled'=>'canceled','closed'=>'closed','new'=>'new']); ?>
                 Удалить товары
+                ?>
                 <table class="table table-bordered">
                     <tr>
-                        <th>id</th><th>name - price</th><th>remove link</th>
+                        <th>id</th><th>articul</th><th>name</th><th>description</th><th>price</th><th>remove link</th>
                     </tr>
-                    <? foreach($delete_product_list as $id => $product):?>
+                    <? $sum = 0; ?>
+                    <? foreach($delete_product_list as $product):?>
+                        <? $sum += $product['price']; ?>
                         <tr>
-                            <td><?= $id; ?></td><td><?= $product ?></td><td><a href="/removefromorder/<?= $id ?>">remove</a></td>
+                            <td><?= $product['id']; ?></td><td><?= $product['articul'] ?></td><td><?= $product['name'] ?></td><td><?= $product['description'] ?></td><td><?= $product['price'] ?></td><td><a href="/removefromorder/<?= $product['id'] ?>">remove</a></td>
                         </tr>
                     <? endforeach; ?>
                 </table>
+                Итого заказ на сумму <b><?= $sum ?></b> руб.<br /><br />
                 Добавить товары
                 <table class="table table-bordered">
                     <tr>
-                        <th>id</th><th>name - price</th><th>add link</th>
+                        <th>id</th><th>articul</th><th>name</th><th>description</th><th>price</th><th>add link</th>
                     </tr>
-                    <? foreach($add_product_list as $id => $product):?>
+                    <? foreach($add_product_list as $product):?>
                         <tr>
-                            <td><?= $id; ?></td><td><?= $product ?></td><td><a href="/addtoorder/<?= $id ?>">add</a></td>
+                            <td><?= $product['id']; ?></td><td><?= $product['articul'] ?></td><td><?= $product['name'] ?></td><td><?= $product['description'] ?></td><td><?= $product['price'] ?></td><td><a href="/addtoorder/<?= $product['id'] ?>">add</a></td>
                         </tr>
                     <? endforeach; ?>
                 </table>

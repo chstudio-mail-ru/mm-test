@@ -217,7 +217,7 @@ class Order extends Model
 
         if($id > 0)
         {
-            $rows = $query->select(['orderrefproducts.product_id AS id', 'products.name AS name', 'products.price AS price'])
+            $rows = $query->select(['orderrefproducts.product_id AS id', 'products.*'])
                 ->from('orderrefproducts')
                 ->leftJoin('products', 'orderrefproducts.product_id=products.id')
                 ->where(['orderrefproducts.order_id' => $id])

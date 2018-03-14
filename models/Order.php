@@ -145,19 +145,19 @@ class Order extends Model
 
     /**
      * add product to order
-     * MySQL query INSERT INTO orderrefproducts (order_id, product_id) VALUES ($id, $product_id)
-     * @param integer $id
+     * MySQL query INSERT INTO orderrefproducts (order_id, product_id) VALUES ($order_id, $product_id)
+     * @param integer $order_id
      * @param integer $product_id
      * @return boolean
      */
-    public static function addProduct($id, $product_id)
+    public static function addProduct($order_id, $product_id)
     {
         $connection = \Yii::$app->db;
         $t = date("Y-m-d H:i:s", time());
 
         $command = $connection->createCommand()
             ->insert('orderrefproducts', [
-                'order_id' => $id,
+                'order_id' => $order_id,
                 'product_id' => $product_id,
             ]);
         $result = $command->execute();
@@ -167,7 +167,7 @@ class Order extends Model
             $command = $connection->createCommand()
                 ->update('orders', [
                     'date_change' => $t,
-                ], 'id=' . $id);
+                ], 'id=' . $order_id);
             $command->execute();
         }
 
@@ -177,18 +177,18 @@ class Order extends Model
     /**
      * delete product from order
      * MySQL query DELETE FROM orderrefproducts WHERE order_id=$id AND product_id=$product_id)
-     * @param  integer $id
+     * @param  integer $order_id
      * @param  integer $product_id
      * @return boolean
      */
-    public static function deleteProduct($id, $product_id)
+    public static function deleteProduct($order_id, $product_id)
     {
         $connection = \Yii::$app->db;
         $t = date("Y-m-d H:i:s", time());
 
         $command = $connection->createCommand()
             ->delete('orderrefproducts', [
-                'order_id' => $id,
+                'order_id' => $order_id,
                 'product_id' => $product_id,
             ]);
         $result = $command->execute();
@@ -198,7 +198,7 @@ class Order extends Model
             $command = $connection->createCommand()
                 ->update('orders', [
                     'date_change' => $t,
-                ], 'id=' . $id);
+                ], 'id=' . $order_id);
             $command->execute();
         }
 

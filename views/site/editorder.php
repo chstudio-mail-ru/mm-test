@@ -1,3 +1,27 @@
+<script>
+    function addToOrder(order_id, product_id)
+    {
+        $.ajax({
+            url: '<?= Yii::$app->request->baseUrl. '/addtoorder' ?>',
+            type: 'post',
+            data: {order_id: order_id , product_id: product_id},
+            success: function (data) {
+                location.reload();
+            }
+        });
+    }
+    function removeFromOrder(order_id, product_id)
+    {
+        $.ajax({
+            url: '<?= Yii::$app->request->baseUrl. '/removefromorder' ?>',
+            type: 'post',
+            data: {order_id: order_id , product_id: product_id},
+            success: function (data) {
+                location.reload();
+            }
+        });
+    }
+</script>
 <?php
 
 /* @var $this yii\web\View */
@@ -34,7 +58,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     <? foreach($delete_product_list as $product):?>
                         <? $sum += $product['price']; ?>
                         <tr>
-                            <td><?= $product['id']; ?></td><td><?= $product['articul'] ?></td><td><?= $product['name'] ?></td><td><?= $product['description'] ?></td><td><?= $product['price'] ?></td><td><a href="/removefromorder/<?= $product['id'] ?>">remove</a></td>
+                            <td><?= $product['id']; ?></td><td><?= $product['articul'] ?></td><td><?= $product['name'] ?></td><td><?= $product['description'] ?></td><td><?= $product['price'] ?></td>
+                            <td><a href="javascript:void(0)" onclick="removeFromOrder(<?= $model->id ?>, <?= $product['id']; ?>)">remove</a></td>
                         </tr>
                     <? endforeach; ?>
                 </table>
@@ -46,7 +71,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     </tr>
                     <? foreach($add_product_list as $product):?>
                         <tr>
-                            <td><?= $product['id']; ?></td><td><?= $product['articul'] ?></td><td><?= $product['name'] ?></td><td><?= $product['description'] ?></td><td><?= $product['price'] ?></td><td><a href="/addtoorder/<?= $product['id'] ?>">add</a></td>
+                            <td><?= $product['id']; ?></td><td><?= $product['articul'] ?></td><td><?= $product['name'] ?></td><td><?= $product['description'] ?></td><td><?= $product['price'] ?></td>
+                            <td><a href="javascript:void(0)" onclick="addToOrder(<?= $model->id ?>, <?= $product['id']; ?>)">add</a></td>
                         </tr>
                     <? endforeach; ?>
                 </table>

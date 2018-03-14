@@ -14,7 +14,6 @@ use app\models\AddOrderForm;
 use app\models\User;
 use app\models\AddUserForm;
 use app\models\HistoryOrder;
-use yii\web\Response;
 
 class SiteController extends Controller
 {

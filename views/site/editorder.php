@@ -26,7 +26,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= $form->field($model, 'user_id')->dropDownList($user_list); ?>
                     <?= $form->field($model, 'status')->dropDownList(['confirmed'=>'confirmed','canceled'=>'canceled','closed'=>'closed','new'=>'new']); ?>
                 Удалить товары
-                ?>
                 <table class="table table-bordered">
                     <tr>
                         <th>id</th><th>articul</th><th>name</th><th>description</th><th>price</th><th>remove link</th>

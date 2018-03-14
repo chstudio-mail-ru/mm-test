@@ -22,7 +22,7 @@ class User extends Model
 
         $row = $query->select(['*'])
                      ->from('users')
-                     ->where(['id' => intval($id)])
+                     ->where(['id' => $id])
                      ->one();
 
         

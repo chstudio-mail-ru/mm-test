@@ -13,6 +13,7 @@ use app\models\Order;
 use app\models\AddOrderForm;
 use app\models\User;
 use app\models\AddUserForm;
+use app\models\HistoryOrder;
 
 class SiteController extends Controller
 {
@@ -249,6 +250,29 @@ class SiteController extends Controller
             'user_list' => $user_items,
             'delete_product_list' => $delete_product_list,
             'add_product_list' => $add_product_list,
+        ]);
+    }
+
+    /**
+     * Displays Historyorder info.
+     *
+     * @return string
+     */
+    public function actionHistoryorder()
+    {
+        $order_id = Yii::$app->request->get('id');
+        if ($order_id > 0) {
+            $list_operations = HistoryOrder::listOperations($order_id);
+            return $this->render('historyorder', [
+                'list_operations' => $list_operations,
+                'order_id' => $order_id,
+            ]);
+        }
+        $list_operations = "";
+
+        return $this->render('historyorder', [
+            'list_operations' => $list_operations,
+            'order_id' => null,
         ]);
     }
 }

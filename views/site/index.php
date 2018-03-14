@@ -36,7 +36,7 @@ $this->title = 'Order list';
 
     <table class="table table-bordered">
         <tr>
-            <th>id</th><th>status</th><th>user name</th><th>sum</th><th>date add</th><th>data change</th><th>edit link</th><th>history link</th>
+            <th>id</th><th>status</th><th>user name</th><th>sum</th><th>date add</th><th>date change</th><th>edit link</th><th>history link</th>
         </tr>
         <? foreach($list_orders as $order):?>
             <tr>

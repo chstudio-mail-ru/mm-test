@@ -22,7 +22,6 @@ class Order extends Model
     public $f_sum_min;
     public $f_sum_max;
     public $sum;
-    public $products;
 
     public static function findIdentity($id)
     {
@@ -152,6 +151,7 @@ class Order extends Model
      */
     public static function addProduct($order_id, $product_id)
     {
+        $product = Product::findIdentity($product_id);
         $connection = \Yii::$app->db;
         $t = date("Y-m-d H:i:s", time());
 
@@ -161,6 +161,7 @@ class Order extends Model
                 'product_id' => $product_id,
             ]);
         $result = $command->execute();
+        $_id = $connection->getLastInsertID();
 
         if($result > 0)
         {
@@ -171,25 +172,24 @@ class Order extends Model
             $command->execute();
         }
 
-        return $result > 0;
+        return ($result > 0)? json_encode(array_merge(['_id' => $_id], (array)$product)) : null;
     }
 
     /**
      * delete product from order
-     * MySQL query DELETE FROM orderrefproducts WHERE order_id=$id AND product_id=$product_id)
+     * MySQL query DELETE FROM orderrefproducts WHERE order_id=$id AND record_id=$record_id)
      * @param  integer $order_id
-     * @param  integer $product_id
-     * @return boolean
+     * @param  integer $record_id
+     * @return integer $record_id
      */
-    public static function deleteProduct($order_id, $product_id)
+    public static function deleteProduct($order_id, $record_id)
     {
         $connection = \Yii::$app->db;
         $t = date("Y-m-d H:i:s", time());
 
         $command = $connection->createCommand()
             ->delete('orderrefproducts', [
-                'order_id' => $order_id,
-                'product_id' => $product_id,
+                'id' => $record_id,
             ]);
         $result = $command->execute();
 
@@ -202,7 +202,7 @@ class Order extends Model
             $command->execute();
         }
 
-        return $result > 0;
+        return ($result > 0)? $record_id : null;
     }
 
     /**
@@ -217,7 +217,7 @@ class Order extends Model
 
         if($id > 0)
         {
-            $rows = $query->select(['orderrefproducts.product_id AS id', 'products.*'])
+            $rows = $query->select(['orderrefproducts.id AS _id', 'products.*'])
                 ->from('orderrefproducts')
                 ->leftJoin('products', 'orderrefproducts.product_id=products.id')
                 ->where(['orderrefproducts.order_id' => $id])
@@ -273,21 +273,43 @@ class Order extends Model
     }
 
     /**
-     * view history of order
-     * MySQL query SELECT * FROM logoperations WHERE order_id=$this->id ORDER BY date_add DESC
+     * list operations
+     * MySQL query SELECT * FROM logoperations WHERE order_id=$order_id ORDER BY date_add DESC
+     * @param integer $order_id
      * @return array
      */
-    public static function historyOrder($id)
+    public static function listOperations($order_id)
     {
         $query = new Query();
 
         $rows = $query->select(['*'])
             ->from('logoperations')
-            ->where(['id' => $id])
+            ->where(['order_id' => $order_id])
             ->orderBy(['date_add' => SORT_DESC])
             ->all();
 
         return $rows;
+    }
+
+    /**
+     * calculate sum of order
+     *
+     * @return integer
+     */
+    public static function calculateOrder($id)
+    {
+        $query = new Query();
+
+        $query->select(['SUM(products.price) AS sum'])
+            ->from('orders')
+            ->leftJoin('orderrefproducts', "orders.id=orderrefproducts.order_id")
+            ->leftJoin('products', "orderrefproducts.product_id=products.id")
+            ->where(['orders.id' => $id]);
+
+        $query->groupBy('orderrefproducts.order_id');
+        $row = $query->one();
+
+        return $row['sum'];
     }
 
     /**

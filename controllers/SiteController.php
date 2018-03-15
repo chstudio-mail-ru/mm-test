@@ -13,7 +13,6 @@ use app\models\Order;
 use app\models\AddOrderForm;
 use app\models\User;
 use app\models\AddUserForm;
-use app\models\HistoryOrder;
 
 class SiteController extends Controller
 {
@@ -262,7 +261,7 @@ class SiteController extends Controller
     {
         $order_id = Yii::$app->request->get('id');
         if ($order_id > 0) {
-            $list_operations = HistoryOrder::listOperations($order_id);
+            $list_operations = Order::listOperations($order_id);
             return $this->render('historyorder', [
                 'list_operations' => $list_operations,
                 'order_id' => $order_id,
@@ -285,7 +284,7 @@ class SiteController extends Controller
         $product_id = Yii::$app->request->post('product_id');
 
         if ($order_id > 0 && $product_id > 0) {
-            Order::addProduct($order_id, $product_id);
+            return Order::addProduct($order_id, $product_id);
         }
     }
 
@@ -295,10 +294,22 @@ class SiteController extends Controller
     public function actionRemovefromorder()
     {
         $order_id = Yii::$app->request->post('order_id');
-        $product_id = Yii::$app->request->post('product_id');
+        $record_id = Yii::$app->request->post('record_id');
 
-        if ($order_id > 0 && $product_id > 0) {
-            Order::deleteProduct($order_id, $product_id);
+        if ($order_id > 0 && $record_id > 0) {
+            return Order::deleteProduct($order_id, $record_id);
+        }
+    }
+
+    /**
+     * Ajax Sum Order
+     */
+    public function actionSumorder()
+    {
+        $order_id = Yii::$app->request->post('order_id');
+
+        if ($order_id > 0) {
+            return Order::calculateOrder($order_id);
         }
     }
 }

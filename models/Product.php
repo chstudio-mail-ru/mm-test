@@ -23,7 +23,6 @@ class Product extends Model
     public $f_price_min;
     public $f_price_max;
 
-
     public static function findIdentity($id)
     {
         $query = new Query();
@@ -32,7 +31,6 @@ class Product extends Model
                      ->from('products')
                      ->where(['id' => $id])
                      ->one();
-
 
         return isset($row['id'])? new static($row) : null;
     }
@@ -47,7 +45,6 @@ class Product extends Model
      * @param  integer $num
      * @return static|null
      */
-
     public static function addProduct($articul, $name, $description, $price, $num)
     {
         $connection = \Yii::$app->db;

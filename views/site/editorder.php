@@ -9,7 +9,7 @@
                 arr = JSON.parse(data);
                 $('#delete_products').append('<tr id="product_row_'+arr['_id']+'">' +
                     '<td>'+arr['id']+'</td><td>'+arr['articul']+'</td><td>'+arr['name']+'</td><td>'+arr['description']+'</td><td>'+arr['price']+'</td>' +
-                    '<td><a href="javascript:void(0)" onclick="removeFromOrder('+arr['id']+', '+arr['_id']+')">remove</a></td>' +
+                    '<td><a href="javascript:void(0)" onclick="removeFromOrder('+arr['order_id']+', '+arr['_id']+')">remove</a></td>' +
                     '</tr>');
                 $.ajax({
                     url: '<?= Yii::$app->request->baseUrl. '/sumorder' ?>',
@@ -29,11 +29,12 @@
             type: 'post',
             data: {order_id: order_id , record_id: record_id},
             success: function (data) {
-                $('#product_row_'+data).remove();
+                arr = JSON.parse(data);
+                $('#product_row_'+arr['record_id']).remove();
                 $.ajax({
                     url: '<?= Yii::$app->request->baseUrl. '/sumorder' ?>',
                     type: 'post',
-                    data: {order_id: order_id},
+                    data: {order_id: arr['order_id']},
                     success: function (sum) {
                         $('#sum_order').text(sum);
                     }

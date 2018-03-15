@@ -172,7 +172,7 @@ class Order extends Model
             $command->execute();
         }
 
-        return ($result > 0)? json_encode(array_merge(['_id' => $_id], (array)$product)) : null;
+        return ($result > 0)? json_encode(array_merge(['_id' => $_id, 'order_id' => $order_id], (array)$product)) : null;
     }
 
     /**
@@ -202,7 +202,7 @@ class Order extends Model
             $command->execute();
         }
 
-        return ($result > 0)? $record_id : null;
+        return ($result > 0)? json_encode(['order_id' => $order_id, 'record_id' => $record_id]) : null;
     }
 
     /**
@@ -309,7 +309,7 @@ class Order extends Model
         $query->groupBy('orderrefproducts.order_id');
         $row = $query->one();
 
-        return $row['sum'];
+        return ($row['sum'] > 0)? $row['sum'] : 0;
     }
 
     /**
